@@ -88,21 +88,41 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             nq.PostsynapticNot = NeuronModule.GetQueryArrayOrDefault(query, nameof(NeuronQuery.PostsynapticNot));
             nq.Presynaptic = NeuronModule.GetQueryArrayOrDefault(query, nameof(NeuronQuery.Presynaptic));
             nq.PresynapticNot = NeuronModule.GetQueryArrayOrDefault(query, nameof(NeuronQuery.PresynapticNot));
-            nq.RelativeValues = query["relative"].HasValue ? (RelativeValues?)Enum.Parse(typeof(RelativeValues), query["relative"].ToString(), true) : null;
-            nq.Limit = query["limit"].HasValue ? int.Parse(query["limit"].ToString()) : null;
-            nq.NeuronActiveValues = query["nactive"].HasValue ? (ActiveValues?)Enum.Parse(typeof(ActiveValues), query["nactive"].ToString(), true) : null;
-            nq.TerminalActiveValues = query["tactive"].HasValue ? (ActiveValues?)Enum.Parse(typeof(ActiveValues), query["tactive"].ToString(), true) : null;
+            nq.RegionId = NeuronModule.GetQueryArrayOrDefault(query, nameof(NeuronQuery.RegionId));
+            nq.RegionIdNot = NeuronModule.GetQueryArrayOrDefault(query, nameof(NeuronQuery.RegionIdNot));
+            nq.RelativeValues = NeuronModule.GetNullableEnumValue<RelativeValues>("relative", query);
+            nq.PageSize = NeuronModule.GetNullableIntValue("pagesize", query);
+            nq.Page = NeuronModule.GetNullableIntValue("page", query);
+            nq.NeuronActiveValues = NeuronModule.GetNullableEnumValue<ActiveValues>("nactive", query);
+            nq.TerminalActiveValues = NeuronModule.GetNullableEnumValue<ActiveValues>("tactive", query);
+            nq.SortBy = NeuronModule.GetNullableEnumValue<SortByValue>("sortby", query);
+            nq.SortOrder = NeuronModule.GetNullableEnumValue<SortOrderValue>("sortorder", query);
             return nq;
         }
 
+        // TODO: Transfer to common
+        private static int? GetNullableIntValue(string fieldName, dynamic query)
+        {
+            return query[fieldName].HasValue ? int.Parse(query[fieldName].ToString()) : null;
+        }
+
+        // TODO: Transfer to common
+        private static T? GetNullableEnumValue<T>(string fieldName, dynamic query) where T : struct, Enum
+        {
+            return query[fieldName].HasValue ? (T?)Enum.Parse(typeof(T), query[fieldName].ToString(), true) : null;
+        }
+
+        // TODO: Transfer to common, consolidate with ei8.Cortex.Library.Client.Out.HttpNeuronQueryClient helper methods
         private static IEnumerable<string> GetQueryArrayOrDefault(dynamic query, string parameterName)
         {
             var parameterNameExclamation = parameterName.Replace("Not", "!");
-            return query[parameterName].HasValue ?
+            string[] stringArray = query[parameterName].HasValue ?
                 query[parameterName].ToString().Split(",") :
                     query[parameterNameExclamation].HasValue ?
                     query[parameterNameExclamation].ToString().Split(",") :
                     null;
+
+            return stringArray != null ? stringArray.Select(s => s != "\0" ? s : null) : stringArray;
         }
 
         internal static async Task<Response> ProcessRequest(Func<Task<Response>> action)
