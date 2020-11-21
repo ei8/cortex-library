@@ -1,11 +1,11 @@
 version: '3.4'
 
 services:
-  cortex.library.in.api:
-    env_file:
-      - ./var1.env
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+#  cortex.library.in.api:
+#    env_file:
+#      - ./var1.env
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
   cortex.library.out.api:
     env_file: 
       - ./var1.env
