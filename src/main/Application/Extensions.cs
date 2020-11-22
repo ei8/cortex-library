@@ -24,6 +24,8 @@ namespace ei8.Cortex.Library.Application
             result.PresynapticNot = value.PresynapticNot?.ToArray();
             result.TagContains = value.TagContains?.ToArray();
             result.TagContainsNot = value.TagContainsNot?.ToArray();
+            result.RegionId = value.RegionId?.ToArray();
+            result.RegionIdNot = value.RegionIdNot?.ToArray();
 
             result.RelativeValues = Extensions.ConvertNullableEnumToExternal<RelativeValues, Graph.Common.RelativeValues>(
                 value.RelativeValues, 
@@ -40,7 +42,18 @@ namespace ei8.Cortex.Library.Application
                 v => ((int)v).ToString()
                 );
 
-            result.Limit = value.Limit;
+            result.Page = value.Page;
+            result.PageSize = value.PageSize;
+            
+            result.SortBy = Extensions.ConvertNullableEnumToExternal<SortByValue, Graph.Common.SortByValue>(
+                value.SortBy,
+                v => ((int)v).ToString()
+                );
+
+            result.SortOrder = Extensions.ConvertNullableEnumToExternal<SortOrderValue, Graph.Common.SortOrderValue>(
+                value.SortOrder,
+                v => ((int)v).ToString()
+                );
 
             return result;
         }
@@ -58,34 +71,57 @@ namespace ei8.Cortex.Library.Application
             return r;
         }
 
-        internal static Neuron ToInternalType(this Graph.Common.Neuron value)
+        internal static NeuronResult ToInternalType(this Graph.Common.NeuronResult value)
         {
-            return value != null ? new Neuron()
+            return value != null ? new NeuronResult()
             {
                 Id = value.Id,
                 Tag = value.Tag,
                 Terminal = value.Terminal != null ? new Terminal()
                 {
-                    AuthorId = value.Terminal.AuthorId,
-                    AuthorTag = value.Terminal.AuthorTag,
                     Effect = value.Terminal.Effect,
                     Id = value.Terminal.Id,
                     PostsynapticNeuronId = value.Terminal.PostsynapticNeuronId,
                     PresynapticNeuronId = value.Terminal.PresynapticNeuronId,
                     Strength = value.Terminal.Strength,
-                    Timestamp = value.Terminal.Timestamp,
+                    Creation = value.Terminal.Creation.ToInternalType(),
+                    LastModification = value.Terminal.LastModification.ToInternalType(),
                     Version = value.Terminal.Version,
                     Active = value.Terminal.Active
                 } : null,
                 Version = value.Version,
-                AuthorId = value.AuthorId,
-                AuthorTag = value.AuthorTag,
-                RegionId = value.RegionId,
-                RegionTag = value.RegionTag,
-                Timestamp = value.Timestamp,
+                Creation = value.Creation.ToInternalType(),
+                LastModification = value.LastModification.ToInternalType(),
+                UnifiedLastModification = value.UnifiedLastModification.ToInternalType(),
+                Region = value.Region.ToInternalType(),
                 Active = value.Active
             } :
             null;
+        }
+
+        internal static AuthorEventInfo ToInternalType(this Graph.Common.AuthorEventInfo value)
+        {
+            AuthorEventInfo result = null;
+            if (value != null )
+                result = new AuthorEventInfo()
+                {
+                    Author = value.Author.ToInternalType(),
+                    Timestamp = value.Timestamp
+                };
+            
+            return result;                
+        }
+
+        internal static NeuronInfo ToInternalType(this Graph.Common.NeuronInfo value)
+        {
+            NeuronInfo result = null;
+            if (value != null)
+                result = new NeuronInfo()
+                {
+                    Id = value.Id,
+                    Tag = value.Tag
+                };
+            return result;
         }
 
         internal static Library.Common.Notification ToInternalType(this EventSourcing.Common.Notification value)
@@ -99,6 +135,15 @@ namespace ei8.Cortex.Library.Application
                 AuthorId = value.AuthorId,
                 Version = value.Version,
                 Timestamp = value.Timestamp
+            };
+        }
+
+        internal static QueryResult ToInternalType(this Graph.Common.QueryResult value)
+        {
+            return new QueryResult()
+            {
+                Count = value.Count,
+                Neurons = value.Neurons.Select(n => n.ToInternalType())
             };
         }
     }

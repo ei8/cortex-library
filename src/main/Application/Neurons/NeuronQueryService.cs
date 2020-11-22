@@ -27,33 +27,71 @@ namespace ei8.Cortex.Library.Application.Neurons
             this.settingsService = settingsService;            
         }
 
-        public async Task<IEnumerable<Neuron>> GetNeurons(NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
+        public async Task<QueryResult> GetNeurons(NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
         {
-            var result = await this.graphQueryClient.GetNeurons(
-                this.settingsService.CortexGraphOutBaseUrl + "/",                
+            var commonResult = await this.graphQueryClient.GetNeurons(
+                this.settingsService.CortexGraphOutBaseUrl + "/",
                 neuronQuery.ToExternalType(),
                 token
                 );
 
-            // TODO: call this.validationClient.ReadNeurons
-            // TODO: remove neurons with errors from result set
-
-            return result.Select(cn => cn.ToInternalType());
+            var result = commonResult.ToInternalType();
+            result.Neurons = await NeuronQueryService.ApplyValidation(
+                subjectId, 
+                result.Neurons, 
+                this.validationClient, 
+                this.settingsService, 
+                token
+                );
+            return result;
         }
 
-        public async Task<IEnumerable<Neuron>> GetNeurons(string centralId, NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
+        private async static Task<IEnumerable<NeuronResult>> ApplyValidation(Guid subjectId, IEnumerable<NeuronResult> neurons, IValidationClient validationClient, ISettingsService settingsService, CancellationToken token)
         {
-            var result = await this.graphQueryClient.GetNeurons(
+            // validate read
+            var validationResults = await validationClient.ReadNeurons(
+                settingsService.IdentityAccessOutBaseUrl + "/",
+                neurons.Select(n => Guid.Parse(n.Id)),
+                subjectId,
+                token
+                );
+                        
+            var resultNeurons = neurons.ToList();
+            // mask neurons with errors from result set
+            validationResults.NeuronValidationResults
+                .Where(nv => nv.Errors.Count() > 0)
+                .ToList()
+                .ForEach(nv =>
+                    resultNeurons.Where(ne => ne.Id == nv.NeuronId.ToString())
+                        .ToList()
+                        .ForEach(nef => nef.RestrictAccess(
+                                AccessType.Read,
+                                string.Join("; ", nv.Errors.Select(e => e.Description))
+                            )
+                        )
+                );
+
+            return resultNeurons.ToArray();
+        }
+
+        public async Task<QueryResult> GetNeurons(string centralId, NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
+        {
+            var commonResult = await this.graphQueryClient.GetNeurons(
                 this.settingsService.CortexGraphOutBaseUrl + "/",
                 centralId,
                 neuronQuery.ToExternalType(),
                 token
                 );
 
-            // TODO: call this.validationClient.ReadNeurons
-            // TODO: remove neurons with errors from result set
-
-            return result.Select(cn => cn.ToInternalType());
+            var result = commonResult.ToInternalType();
+            result.Neurons = await NeuronQueryService.ApplyValidation(
+                subjectId,
+                result.Neurons,
+                this.validationClient,
+                this.settingsService,
+                token
+                );
+            return result;
         }
 
         private static Guid? GetNullableStringGuid(string value)
@@ -61,32 +99,29 @@ namespace ei8.Cortex.Library.Application.Neurons
             return (value == null ? (Guid?) null : Guid.Parse(value));
         }
 
-        public async Task<Neuron> GetNeuronById(string id, NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
+        public async Task<QueryResult> GetNeuronById(string id, NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
         {
-            var result = await this.graphQueryClient.GetNeuronById(
+            var commonResult = await this.graphQueryClient.GetNeuronById(
                 this.settingsService.CortexGraphOutBaseUrl + "/",
                 id,
                 neuronQuery.ToExternalType(),
                 token
                 );
 
-            var avr = await this.validationClient.ReadNeurons(
-                this.settingsService.IdentityAccessOutBaseUrl + "/",
-                new Guid[] { Guid.Parse(id) },
+            var result = commonResult.ToInternalType();
+            result.Neurons = await NeuronQueryService.ApplyValidation(
                 subjectId,
+                result.Neurons,
+                this.validationClient,
+                this.settingsService,
                 token
                 );
-
-            // TODO: avr.HasErrors()
-
-            // TODO: remove neurons with errors from result set
-
-            return result.ToInternalType();
+            return result;
         }
 
-        public async Task<IEnumerable<Neuron>> GetNeuronById(string id, string centralId, NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
+        public async Task<QueryResult> GetNeuronById(string id, string centralId, NeuronQuery neuronQuery, Guid subjectId, CancellationToken token = default(CancellationToken))
         {
-            var result = await this.graphQueryClient.GetNeuronById(
+            var commonResult = await this.graphQueryClient.GetNeuronById(
                 this.settingsService.CortexGraphOutBaseUrl + "/",
                 id,
                 centralId,
@@ -94,10 +129,15 @@ namespace ei8.Cortex.Library.Application.Neurons
                 token
                 );
 
-            // TODO: call this.validationClient.ReadNeurons
-            // TODO: remove neurons with errors from result set
-
-            return result.Select(cn => cn.ToInternalType());
+            var result = commonResult.ToInternalType();
+            result.Neurons = await NeuronQueryService.ApplyValidation(
+                subjectId,
+                result.Neurons,
+                this.validationClient,
+                this.settingsService,
+                token
+                );
+            return result;
         }
     }
 }
