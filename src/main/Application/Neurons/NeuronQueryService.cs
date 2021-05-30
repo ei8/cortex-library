@@ -72,7 +72,7 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             resultNeurons.ToList().ForEach(
-                rn => rn.IsCurrentUserCreationAuthor = rn.Creation.Author.Id == validationResults.UserNeuronId.ToString()
+                rn => rn.IsCurrentUserCreationAuthor = rn.Creation?.Author.Id == validationResults.UserNeuronId.ToString()
                 );
 
             return resultNeurons.ToArray();
