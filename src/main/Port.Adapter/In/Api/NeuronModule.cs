@@ -25,13 +25,13 @@
 //                                Guid.Parse(bodyAsObject.Id.ToString()),
 //                                bodyAsObject.Tag.ToString(),
 //                                Guid.Parse(bodyAsObject.RegionId.ToString()),
-//                                Guid.Parse(bodyAsObject.SubjectId.ToString())
+//                                Guid.Parse(bodyAsObject.UserId.ToString())
 //                                );                            
 //                        },
 //                        "Id",
 //                        "Tag",
 //                        "RegionId",
-//                        "SubjectId"
+//                        "UserId"
 //                    );
 //            }
 //            );
@@ -46,12 +46,12 @@
 //                            return new ChangeNeuronTag(
 //                                Guid.Parse(parameters.neuronId),
 //                                bodyAsObject.Tag.ToString(),
-//                                Guid.Parse(bodyAsObject.SubjectId.ToString()),
+//                                Guid.Parse(bodyAsObject.UserId.ToString()),
 //                                expectedVersion
 //                                );
 //                        },
 //                        "Tag",
-//                        "SubjectId"
+//                        "UserId"
 //                    );
 //            }
 //            );
@@ -65,11 +65,11 @@
 //                        {
 //                            return new DeactivateNeuron(
 //                                Guid.Parse(parameters.neuronId),
-//                                Guid.Parse(bodyAsObject.SubjectId.ToString()),
+//                                Guid.Parse(bodyAsObject.UserId.ToString()),
 //                                expectedVersion
 //                                );
 //                        },
-//                        "SubjectId"
+//                        "UserId"
 //                    );
 //            }
 //            );

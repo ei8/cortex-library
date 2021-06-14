@@ -19,7 +19,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             {
                 return await NeuronModule.ProcessRequest(async () =>
                 {
-                    var nv = await queryService.GetNeurons(NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetSubjectId(this.Request));
+                    var nv = await queryService.GetNeurons(NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetUserId(this.Request));
                     return new TextResponse(JsonConvert.SerializeObject(nv));
                 }
                 );
@@ -30,7 +30,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             {
                 return await NeuronModule.ProcessRequest(async () =>
                 {
-                    var nv = await queryService.GetNeuronById(parameters.neuronid, NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetSubjectId(this.Request));
+                    var nv = await queryService.GetNeuronById(parameters.neuronid, NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetUserId(this.Request));
                     return new TextResponse(JsonConvert.SerializeObject(nv));
                 }
                 );
@@ -44,7 +44,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
                     var nv = await queryService.GetNeurons(
                         parameters.centralid,
                         NeuronModule.ExtractQuery(this.Request.Query),
-                        NeuronModule.GetSubjectId(this.Request)
+                        NeuronModule.GetUserId(this.Request)
                         );
 
                     return new TextResponse(JsonConvert.SerializeObject(nv));
@@ -61,7 +61,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
                         parameters.neuronid,
                         parameters.centralid,
                         NeuronModule.ExtractQuery(this.Request.Query), 
-                        NeuronModule.GetSubjectId(this.Request)
+                        NeuronModule.GetUserId(this.Request)
                         );
                     return new TextResponse(JsonConvert.SerializeObject(nv));
                 }
@@ -70,11 +70,11 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             );
         }
 
-        private static Guid GetSubjectId(Request value)
+        private static string GetUserId(Request value)
         {
-            AssertionConcern.AssertArgumentValid(k => k, (bool) value.Query["subjectid"].HasValue, "Subject Id was not found.", "subjectid");
+            AssertionConcern.AssertArgumentValid(k => k, (bool) value.Query["userid"].HasValue, "User Id was not found.", "userid");
 
-            return Guid.Parse(value.Query["subjectid"].ToString());
+            return value.Query["userid"].ToString();
         }
 
         private static NeuronQuery ExtractQuery(dynamic query)

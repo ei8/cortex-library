@@ -7,7 +7,7 @@ services:
 #      context: .
 #      dockerfile: ./main/Port.Adapter/In/Api/Dockerfile
   cortex.library.out.api:
-    image: ei8works/cortex.library.out.api:0.1.3
+    image: ei8works/cortex.library.out.api:0.1.4
     build:
       context: .
       dockerfile: ./main/Port.Adapter/Out/Api/Dockerfile
