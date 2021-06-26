@@ -146,5 +146,33 @@ namespace ei8.Cortex.Library.Application
                 Neurons = value.Neurons.Select(n => n.ToInternalType())
             };
         }
+
+        internal static void RestrictAccess(this NeuronResult value, AccessType type, string reason)
+        {
+            if (type == AccessType.Write)
+                value.ReadOnly = true;
+            else
+            {
+                value.Id = Guid.Empty.ToString();
+                value.Tag = string.Empty;
+
+                if (value.Terminal != null)
+                    value.Terminal = new Terminal() { Creation = Extensions.CreateAuthorEventInfo() };
+
+                value.Active = true;
+                value.Creation = Extensions.CreateAuthorEventInfo();
+                value.Region = new NeuronInfo();
+                value.LastModification = Extensions.CreateAuthorEventInfo();
+                value.UnifiedLastModification = Extensions.CreateAuthorEventInfo();
+                value.Version = 0;
+            }
+
+            value.RestrictionReasons = value.RestrictionReasons.Concat(new string[] { reason });
+        }
+
+        private static AuthorEventInfo CreateAuthorEventInfo()
+        {
+            return new AuthorEventInfo() { Author = new NeuronInfo() };
+        }
     }
 }
