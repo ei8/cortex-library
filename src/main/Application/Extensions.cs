@@ -71,24 +71,13 @@ namespace ei8.Cortex.Library.Application
             return r;
         }
 
-        internal static NeuronResult ToInternalType(this Graph.Common.NeuronResult value)
+        internal static Neuron ToInternalType(this Graph.Common.NeuronResult value)
         {
-            return value != null ? new NeuronResult()
+            return value != null ? new Neuron()
             {
                 Id = value.Id,
                 Tag = value.Tag,
-                Terminal = value.Terminal != null ? new Terminal()
-                {
-                    Effect = value.Terminal.Effect,
-                    Id = value.Terminal.Id,
-                    PostsynapticNeuronId = value.Terminal.PostsynapticNeuronId,
-                    PresynapticNeuronId = value.Terminal.PresynapticNeuronId,
-                    Strength = value.Terminal.Strength,
-                    Creation = value.Terminal.Creation.ToInternalType(),
-                    LastModification = value.Terminal.LastModification.ToInternalType(),
-                    Version = value.Terminal.Version,
-                    Active = value.Terminal.Active
-                } : null,
+                Terminal = value.Terminal != null ? value.Terminal.ToInternalType() : null,
                 Version = value.Version,
                 Creation = value.Creation.ToInternalType(),
                 LastModification = value.LastModification.ToInternalType(),
@@ -97,6 +86,22 @@ namespace ei8.Cortex.Library.Application
                 Active = value.Active
             } :
             null;
+        }
+
+        private static Terminal ToInternalType(this Graph.Common.Terminal value)
+        {
+            return new Terminal()
+            {
+                Effect = value.Effect,
+                Id = value.Id,
+                PostsynapticNeuronId = value.PostsynapticNeuronId,
+                PresynapticNeuronId = value.PresynapticNeuronId,
+                Strength = value.Strength,
+                Creation = value.Creation.ToInternalType(),
+                LastModification = value.LastModification.ToInternalType(),
+                Version = value.Version,
+                Active = value.Active
+            };
         }
 
         internal static AuthorEventInfo ToInternalType(this Graph.Common.AuthorEventInfo value)
@@ -138,19 +143,28 @@ namespace ei8.Cortex.Library.Application
             };
         }
 
-        internal static QueryResult ToInternalType(this Graph.Common.QueryResult value)
+        internal static QueryResult<Terminal> ToQueryResult(this Graph.Common.Terminal value)
         {
-            return new QueryResult()
+            return new QueryResult<Terminal>()
             {
-                Count = value.Count,
-                Neurons = value.Neurons.Select(n => n.ToInternalType())
+                Count = 1,
+                Items = new Terminal[] { value.ToInternalType() }
             };
         }
 
-        internal static void RestrictAccess(this NeuronResult value, AccessType type, string reason)
+        internal static QueryResult<Neuron> ToInternalType(this Graph.Common.QueryResult value)
+        {
+            return new QueryResult<Neuron>()
+            {
+                Count = value.Count,
+                Items = value.Neurons.Select(n => n.ToInternalType())
+            };
+        }
+
+        internal static void RestrictAccess(this Neuron value, AccessType type, string reason)
         {
             if (type == AccessType.Write)
-                value.ReadOnly = true;
+                value.Validation.ReadOnly = true;
             else
             {
                 value.Id = Guid.Empty.ToString();
@@ -167,7 +181,7 @@ namespace ei8.Cortex.Library.Application
                 value.Version = 0;
             }
 
-            value.RestrictionReasons = value.RestrictionReasons.Concat(new string[] { reason });
+            value.Validation.RestrictionReasons = value.Validation.RestrictionReasons.Concat(new string[] { reason });
         }
 
         private static AuthorEventInfo CreateAuthorEventInfo()
