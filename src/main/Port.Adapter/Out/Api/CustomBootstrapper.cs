@@ -26,6 +26,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             container.Register<INeuronGraphQueryClient, HttpNeuronGraphQueryClient>();
             container.Register<IValidationClient, HttpValidationClient>();
             container.Register<INeuronQueryService, NeuronQueryService>();
+            container.Register<ITerminalQueryService, TerminalQueryService>();
             container.Register<IEventSerializer, EventSerializer>();
             container.Register<IEventStoreCoreClient, HttpEventStoreCoreClient>();
             container.Register<IEventStoreApplicationService, EventStoreApplicationService>();

@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ei8.Cortex.IdentityAccess.Client.Out;
 using ei8.Cortex.Library.Common;
 
 namespace ei8.Cortex.Library.Application
@@ -170,8 +174,8 @@ namespace ei8.Cortex.Library.Application
                 value.Id = Guid.Empty.ToString();
                 value.Tag = string.Empty;
 
-                if (value.Terminal != null)
-                    value.Terminal = new Terminal() { Creation = Extensions.CreateAuthorEventInfo() };
+                if (value.Terminal != null && value.Type == RelativeType.Presynaptic)
+                    value.Terminal.RestrictAccess(type, reason);
 
                 value.Active = true;
                 value.Creation = Extensions.CreateAuthorEventInfo();
@@ -184,9 +188,112 @@ namespace ei8.Cortex.Library.Application
             value.Validation.RestrictionReasons = value.Validation.RestrictionReasons.Concat(new string[] { reason });
         }
 
+        internal static void RestrictAccess(this Terminal value, AccessType type, string reason)
+        {
+            if (type == AccessType.Write)
+            {
+                value.Validation.ReadOnly = true;
+            }
+            else
+            {                
+                value.Id = Guid.Empty.ToString();
+                value.PresynapticNeuronId = Guid.Empty.ToString();
+                value.PostsynapticNeuronId = Guid.Empty.ToString();
+                value.Effect = string.Empty;
+                value.Strength = string.Empty;
+                value.Version = 0;
+                value.Creation = Extensions.CreateAuthorEventInfo();
+                value.LastModification = Extensions.CreateAuthorEventInfo();
+                value.Active = true;
+                value.Url = string.Empty;
+            }
+
+            value.Validation.RestrictionReasons = value.Validation.RestrictionReasons.Concat(new string[] { reason });
+        }
+
         private static AuthorEventInfo CreateAuthorEventInfo()
         {
             return new AuthorEventInfo() { Author = new NeuronInfo() };
+        }
+
+        internal async static Task<IEnumerable<Neuron>> ProcessValidate(this IEnumerable<Neuron> neurons, string userId, IValidationClient validationClient, ISettingsService settingsService, CancellationToken token)
+        {
+            // validate read
+            var validationResults = await validationClient.ReadNeurons(
+                settingsService.IdentityAccessOutBaseUrl + "/",
+                neurons.Select(n => Guid.Parse(n.Id)),
+                userId,
+                token
+                );
+                        
+            var resultNeurons = neurons.ToList();
+            // mask neurons with errors from result set
+            validationResults.NeuronValidationResults
+                .Where(nv => nv.Errors.Count() > 0)
+                .ToList()
+                .ForEach(nv =>
+                    resultNeurons.Where(ne => ne.Id == nv.NeuronId.ToString())
+                        .ToList()
+                        .ForEach(nef => nef.RestrictAccess(
+                                AccessType.Read,
+                                string.Join("; ", nv.Errors.Select(e => e.Description))
+                            )
+                        )
+                );
+
+            resultNeurons.ToList().ForEach(
+                rn => {
+                    rn.Validation.IsCurrentUserCreationAuthor = rn.Creation?.Author.Id == validationResults.UserNeuronId.ToString();
+                    rn.Url = Uri.TryCreate(new Uri(settingsService.NeuronsUrl), rn.Id, out Uri nresult) ?
+                        nresult.AbsoluteUri : 
+                        throw new InvalidOperationException($"URL generation failed for Neuron with Id '{rn.Id}'");
+
+                    if (rn.Terminal != null)
+                        rn.Terminal.UpdateTerminal(validationResults.UserNeuronId.ToString(), settingsService.TerminalsUrl);
+                }
+                );
+
+            return resultNeurons.ToArray();
+        }
+
+        internal async static Task<IEnumerable<Terminal>> ProcessValidate(this IEnumerable<Terminal> terminals, string userId, IValidationClient validationClient, ISettingsService settingsService, CancellationToken token)
+        {
+            // validate read
+            var validationResults = await validationClient.ReadNeurons(
+                settingsService.IdentityAccessOutBaseUrl + "/",
+                terminals.Select(t => Guid.Parse(t.PresynapticNeuronId)),
+                userId,
+                token
+                );
+                        
+            var resultTerminals = terminals.ToList();
+            // mask neurons with errors from result set
+            validationResults.NeuronValidationResults
+                .Where(nv => nv.Errors.Count() > 0)
+                .ToList()
+                .ForEach(nv =>
+                    resultTerminals.Where(te => te.PresynapticNeuronId == nv.NeuronId.ToString())
+                        .ToList()
+                        .ForEach(tef => tef.RestrictAccess(
+                                AccessType.Read,
+                                "Presynaptic Errors: " + string.Join("; ", nv.Errors.Select(e => e.Description))
+                            )
+                        )
+                );
+
+            resultTerminals.ToList().ForEach(
+                rt => rt.UpdateTerminal(validationResults.UserNeuronId.ToString(), settingsService.TerminalsUrl)
+                );
+
+            return resultTerminals.ToArray();
+        }
+
+        private static void UpdateTerminal(this Terminal terminal, string userNeuronId, string terminalsUrl)
+        {
+            terminal.Validation.IsCurrentUserCreationAuthor = terminal.Creation?.Author.Id == userNeuronId;
+            terminal.Url = Uri.TryCreate(new Uri(terminalsUrl), terminal.Id, out Uri tresult) ?
+                tresult.AbsoluteUri : 
+                throw new InvalidOperationException($"URL generation failed for Terminal with Id '{terminal.Id}'");
         }
     }
 }

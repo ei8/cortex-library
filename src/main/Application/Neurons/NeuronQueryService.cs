@@ -36,48 +36,15 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType();
-            result.Items = await NeuronQueryService.ApplyValidation(
+            result.Items = await result.Items.ProcessValidate(
                 userId, 
-                result.Items, 
                 this.validationClient, 
                 this.settingsService, 
                 token
                 );
             return result;
         }
-
-        private async static Task<IEnumerable<Neuron>> ApplyValidation(string userId, IEnumerable<Neuron> neurons, IValidationClient validationClient, ISettingsService settingsService, CancellationToken token)
-        {
-            // validate read
-            var validationResults = await validationClient.ReadNeurons(
-                settingsService.IdentityAccessOutBaseUrl + "/",
-                neurons.Select(n => Guid.Parse(n.Id)),
-                userId,
-                token
-                );
-                        
-            var resultNeurons = neurons.ToList();
-            // mask neurons with errors from result set
-            validationResults.NeuronValidationResults
-                .Where(nv => nv.Errors.Count() > 0)
-                .ToList()
-                .ForEach(nv =>
-                    resultNeurons.Where(ne => ne.Id == nv.NeuronId.ToString())
-                        .ToList()
-                        .ForEach(nef => nef.RestrictAccess(
-                                AccessType.Read,
-                                string.Join("; ", nv.Errors.Select(e => e.Description))
-                            )
-                        )
-                );
-
-            resultNeurons.ToList().ForEach(
-                rn => rn.Validation.IsCurrentUserCreationAuthor = rn.Creation?.Author.Id == validationResults.UserNeuronId.ToString()
-                );
-
-            return resultNeurons.ToArray();
-        }
-
+        
         public async Task<QueryResult<Neuron>> GetNeurons(string centralId, NeuronQuery neuronQuery, string userId, CancellationToken token = default(CancellationToken))
         {
             var commonResult = await this.graphQueryClient.GetNeurons(
@@ -88,9 +55,8 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType();
-            result.Items = await NeuronQueryService.ApplyValidation(
+            result.Items = await result.Items.ProcessValidate(
                 userId,
-                result.Items,
                 this.validationClient,
                 this.settingsService,
                 token
@@ -113,9 +79,8 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType();
-            result.Items = await NeuronQueryService.ApplyValidation(
+            result.Items = await result.Items.ProcessValidate(
                 userId,
-                result.Items,
                 this.validationClient,
                 this.settingsService,
                 token
@@ -134,9 +99,8 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType();
-            result.Items = await NeuronQueryService.ApplyValidation(
+            result.Items = await result.Items.ProcessValidate(
                 userId,
-                result.Items,
                 this.validationClient,
                 this.settingsService,
                 token

@@ -29,23 +29,21 @@ namespace ei8.Cortex.Library.Application.Neurons
 
         public async Task<QueryResult<Terminal>> GetTerminalById(string id, NeuronQuery neuronQuery, string userId, CancellationToken token = default)
         {
-            throw new NotSupportedException();
-            // TODO: var commonResult = await this.graphQueryClient.GetTerminalById(
-            //    this.settingsService.CortexGraphOutBaseUrl + "/",
-            //    id,
-            //    neuronQuery.ToExternalType(),
-            //    token
-            //    );
+            var commonResult = await this.graphQueryClient.GetTerminalById(
+               this.settingsService.CortexGraphOutBaseUrl + "/",
+               id,
+               neuronQuery.ToExternalType(),
+               token
+               );
 
-            //var result = commonResult.ToQueryResult();
-            //result.Items = await NeuronQueryService.ApplyValidation(
-            //    userId,
-            //    result.Items,
-            //    this.validationClient,
-            //    this.settingsService,
-            //    token
-            //    );
-            //return result;
+            var result = commonResult.ToQueryResult();
+            result.Items = await result.Items.ProcessValidate(
+               userId,
+               this.validationClient,
+               this.settingsService,
+               token
+               );
+            return result;
         }
     }
 }

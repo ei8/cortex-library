@@ -88,14 +88,14 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             );
         }
 
-        private static string GetUserId(Request value)
+        internal static string GetUserId(Request value)
         {
             AssertionConcern.AssertArgumentValid(k => k, (bool) value.Query["userid"].HasValue, "User Id was not found.", "userid");
 
             return value.Query["userid"].ToString();
         }
 
-        private static NeuronQuery ExtractQuery(dynamic query)
+        internal static NeuronQuery ExtractQuery(dynamic query)
         {
             var nq = new NeuronQuery();
             nq.TagContains = NeuronModule.GetQueryArrayOrDefault(query, nameof(NeuronQuery.TagContains));

@@ -13,5 +13,9 @@ namespace ei8.Cortex.Library.Port.Adapter.IO.Process.Services
         public string IdentityAccessInBaseUrl => Environment.GetEnvironmentVariable(EnvironmentVariableKeys.IdentityAccessInBaseUrl);
 
         public string IdentityAccessOutBaseUrl => Environment.GetEnvironmentVariable(EnvironmentVariableKeys.IdentityAccessOutBaseUrl);
+
+        public string NeuronsUrl => Environment.GetEnvironmentVariable(EnvironmentVariableKeys.NeuronsUrl);
+
+        public string TerminalsUrl => Environment.GetEnvironmentVariable(EnvironmentVariableKeys.TerminalsUrl);
     }
 }

@@ -1,4 +1,5 @@
-﻿using ei8.Cortex.Library.Application.Notification;
+﻿using ei8.Cortex.Library.Application.Neurons;
+using ei8.Cortex.Library.Application.Notification;
 using Nancy;
 using Nancy.Responses;
 using Newtonsoft.Json;
@@ -11,7 +12,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
 {
     public class TerminalModule : NancyModule
     {
-        public TerminalModule(IEventStoreApplicationService eventStoreApplicationService) : base("/cortex/terminals")
+        public TerminalModule(ITerminalQueryService terminalQueryService, IEventStoreApplicationService eventStoreApplicationService) : base("/cortex/terminals")
         {
             this.Get("/{aggregateid:guid}/events", async (parameters) =>
             {
@@ -24,6 +25,17 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
                         0
                         );
 
+                    return new TextResponse(JsonConvert.SerializeObject(nv));
+                }
+                );
+            }
+            );
+
+            this.Get("/{terminalid:guid}", async (parameters) =>
+            {
+                return await NeuronModule.ProcessRequest(async () =>
+                {
+                    var nv = await terminalQueryService.GetTerminalById(parameters.terminalid, NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetUserId(this.Request));
                     return new TextResponse(JsonConvert.SerializeObject(nv));
                 }
                 );

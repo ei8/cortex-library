@@ -10,5 +10,7 @@ namespace ei8.Cortex.Library.Application
         string EventSourcingOutBaseUrl { get; }       
         string IdentityAccessInBaseUrl { get; }
         string IdentityAccessOutBaseUrl { get; }
+        string NeuronsUrl { get; }
+        string TerminalsUrl { get; }
     }
 }
