@@ -36,7 +36,7 @@ namespace ei8.Cortex.Library.Application.Neurons
                token
                );
 
-            var result = commonResult.ToQueryResult();
+            var result = commonResult.ToInternalType(n => n.Terminal.ToInternalType());
             result.Items = await result.Items.ProcessValidate(
                userId,
                this.validationClient,

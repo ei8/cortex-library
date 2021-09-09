@@ -92,7 +92,7 @@ namespace ei8.Cortex.Library.Application
             null;
         }
 
-        private static Terminal ToInternalType(this Graph.Common.Terminal value)
+        internal static Terminal ToInternalType(this Graph.Common.Terminal value)
         {
             return new Terminal()
             {
@@ -147,21 +147,14 @@ namespace ei8.Cortex.Library.Application
             };
         }
 
-        internal static QueryResult<Terminal> ToQueryResult(this Graph.Common.Terminal value)
+        internal static QueryResult<T> ToInternalType<T>(
+            this Graph.Common.QueryResult value, 
+            Func<Graph.Common.NeuronResult, T> itemsSelector) where T : class
         {
-            return new QueryResult<Terminal>()
-            {
-                Count = 1,
-                Items = new Terminal[] { value.ToInternalType() }
-            };
-        }
-
-        internal static QueryResult<Neuron> ToInternalType(this Graph.Common.QueryResult value)
-        {
-            return new QueryResult<Neuron>()
+            return new QueryResult<T>()
             {
                 Count = value.Count,
-                Items = value.Neurons.Select(n => n.ToInternalType())
+                Items = value.Neurons.Select(n => itemsSelector(n))
             };
         }
 

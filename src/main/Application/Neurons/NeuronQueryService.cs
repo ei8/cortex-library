@@ -35,7 +35,7 @@ namespace ei8.Cortex.Library.Application.Neurons
                 token
                 );
 
-            var result = commonResult.ToInternalType();
+            var result = commonResult.ToInternalType(n => n.ToInternalType());
             result.Items = await result.Items.ProcessValidate(
                 userId, 
                 this.validationClient, 
@@ -54,7 +54,7 @@ namespace ei8.Cortex.Library.Application.Neurons
                 token
                 );
 
-            var result = commonResult.ToInternalType();
+            var result = commonResult.ToInternalType(n => n.ToInternalType());
             result.Items = await result.Items.ProcessValidate(
                 userId,
                 this.validationClient,
@@ -78,7 +78,7 @@ namespace ei8.Cortex.Library.Application.Neurons
                 token
                 );
 
-            var result = commonResult.ToInternalType();
+            var result = commonResult.ToInternalType(n => n.ToInternalType());
             result.Items = await result.Items.ProcessValidate(
                 userId,
                 this.validationClient,
@@ -98,7 +98,7 @@ namespace ei8.Cortex.Library.Application.Neurons
                 token
                 );
 
-            var result = commonResult.ToInternalType();
+            var result = commonResult.ToInternalType(n => n.ToInternalType());
             result.Items = await result.Items.ProcessValidate(
                 userId,
                 this.validationClient,
