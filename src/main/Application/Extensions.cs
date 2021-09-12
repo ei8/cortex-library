@@ -30,6 +30,8 @@ namespace ei8.Cortex.Library.Application
             result.TagContainsNot = value.TagContainsNot?.ToArray();
             result.RegionId = value.RegionId?.ToArray();
             result.RegionIdNot = value.RegionIdNot?.ToArray();
+            result.ExternalReferenceUrl = value.ExternalReferenceUrl?.ToArray();
+            result.ExternalReferenceUrlContains = value.ExternalReferenceUrlContains?.ToArray();
 
             result.RelativeValues = Extensions.ConvertNullableEnumToExternal<RelativeValues, Graph.Common.RelativeValues>(
                 value.RelativeValues, 
@@ -87,6 +89,7 @@ namespace ei8.Cortex.Library.Application
                 LastModification = value.LastModification.ToInternalType(),
                 UnifiedLastModification = value.UnifiedLastModification.ToInternalType(),
                 Region = value.Region.ToInternalType(),
+                ExternalReferenceUrl = value.ExternalReferenceUrl,
                 Active = value.Active
             } :
             null;
@@ -104,6 +107,7 @@ namespace ei8.Cortex.Library.Application
                 Creation = value.Creation.ToInternalType(),
                 LastModification = value.LastModification.ToInternalType(),
                 Version = value.Version,
+                ExternalReferenceUrl = value.ExternalReferenceUrl,
                 Active = value.Active
             };
         }
@@ -175,6 +179,7 @@ namespace ei8.Cortex.Library.Application
                 value.Region = new NeuronInfo();
                 value.LastModification = Extensions.CreateAuthorEventInfo();
                 value.UnifiedLastModification = Extensions.CreateAuthorEventInfo();
+                value.ExternalReferenceUrl = string.Empty;
                 value.Version = 0;
             }
 
@@ -199,6 +204,7 @@ namespace ei8.Cortex.Library.Application
                 value.LastModification = Extensions.CreateAuthorEventInfo();
                 value.Active = true;
                 value.Url = string.Empty;
+                value.ExternalReferenceUrl = string.Empty;
             }
 
             value.Validation.RestrictionReasons = value.Validation.RestrictionReasons.Concat(new string[] { reason });

@@ -41,6 +41,17 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
                 );
             }
             );
+
+            this.Get(string.Empty, async (parameters) =>
+            {
+                return await NeuronModule.ProcessRequest(async () =>
+                    {
+                        var nv = await terminalQueryService.GetTerminals(NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetUserId(this.Request));
+                        return new TextResponse(JsonConvert.SerializeObject(nv));
+                    }
+                );
+            }
+            );
         }
     }
 }

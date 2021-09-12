@@ -115,6 +115,8 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             nq.TerminalActiveValues = NeuronModule.GetNullableEnumValue<ActiveValues>("tactive", query);
             nq.SortBy = NeuronModule.GetNullableEnumValue<SortByValue>("sortby", query);
             nq.SortOrder = NeuronModule.GetNullableEnumValue<SortOrderValue>("sortorder", query);
+            nq.ExternalReferenceUrl = NeuronModule.GetQueryArrayOrDefault(query, "erurl");
+            nq.ExternalReferenceUrlContains = NeuronModule.GetQueryArrayOrDefault(query, "erurlcontains");
             return nq;
         }
 

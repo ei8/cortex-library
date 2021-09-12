@@ -10,5 +10,7 @@ namespace ei8.Cortex.Library.Application.Neurons
     public interface ITerminalQueryService
     {
         Task<QueryResult<Terminal>> GetTerminalById(string id, NeuronQuery neuronQuery, string userId, CancellationToken token = default(CancellationToken));
+
+        Task<QueryResult<Terminal>> GetTerminals(NeuronQuery neuronQuery, string userId, CancellationToken token = default(CancellationToken));
     }
 }

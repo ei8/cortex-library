@@ -36,11 +36,44 @@ namespace ei8.Cortex.Library.Application.Neurons
                token
                );
 
+            return await TerminalQueryService.ConvertProcessValidate(
+                commonResult,
+                userId,
+                validationClient,
+                settingsService,
+                token
+            );
+        }
+
+        public async Task<QueryResult<Terminal>> GetTerminals(NeuronQuery neuronQuery, string userId, CancellationToken token = default(CancellationToken))
+        {
+            var commonResult = await this.graphQueryClient.GetTerminals(
+               this.settingsService.CortexGraphOutBaseUrl + "/",
+               neuronQuery.ToExternalType(),
+               token
+               );
+
+            return await TerminalQueryService.ConvertProcessValidate(
+                commonResult,
+                userId,
+                validationClient,
+                settingsService,
+                token
+            );
+        }
+        private static async Task<QueryResult<Terminal>> ConvertProcessValidate(
+            Graph.Common.QueryResult commonResult, 
+            string userId,
+            IValidationClient validationClient, 
+            ISettingsService settingsService, 
+            CancellationToken token
+            )
+        {
             var result = commonResult.ToInternalType(n => n.Terminal.ToInternalType());
             result.Items = await result.Items.ProcessValidate(
                userId,
-               this.validationClient,
-               this.settingsService,
+               validationClient,
+               settingsService,
                token
                );
             return result;
