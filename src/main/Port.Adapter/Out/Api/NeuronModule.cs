@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 using ei8.Cortex.Library.Common;
 using ei8.Cortex.Library.Application.Neurons;
 using neurUL.Common.Domain.Model;
+using ei8.Cortex.Library.Application.Notification;
 
 namespace ei8.Cortex.Library.Port.Adapter.Out.Api
 {
     public class NeuronModule : NancyModule
     {
-        public NeuronModule(INeuronQueryService queryService) : base("/cortex/neurons")
+        public NeuronModule(INeuronQueryService queryService, IEventStoreApplicationService eventStoreApplicationService) : base("/cortex/neurons")
         {
             this.Get("", async (parameters) =>
             {
@@ -68,16 +69,33 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
                 );
             }
             );
+
+            this.Get("/{aggregateid:guid}/events", async (parameters) =>
+            {
+                return await NeuronModule.ProcessRequest(async () =>
+                {
+                    // TODO: validate if guid represents a neuron
+
+                    var nv = await eventStoreApplicationService.Get(
+                        parameters.aggregateid,
+                        0
+                        );
+
+                    return new TextResponse(JsonConvert.SerializeObject(nv));
+                }
+                );
+            }
+            );
         }
 
-        private static string GetUserId(Request value)
+        internal static string GetUserId(Request value)
         {
             AssertionConcern.AssertArgumentValid(k => k, (bool) value.Query["userid"].HasValue, "User Id was not found.", "userid");
 
             return value.Query["userid"].ToString();
         }
 
-        private static NeuronQuery ExtractQuery(dynamic query)
+        internal static NeuronQuery ExtractQuery(dynamic query)
         {
             var nq = new NeuronQuery();
             nq.TagContains = NeuronModule.GetQueryArrayOrDefault(query, nameof(NeuronQuery.TagContains));
@@ -97,6 +115,8 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             nq.TerminalActiveValues = NeuronModule.GetNullableEnumValue<ActiveValues>("tactive", query);
             nq.SortBy = NeuronModule.GetNullableEnumValue<SortByValue>("sortby", query);
             nq.SortOrder = NeuronModule.GetNullableEnumValue<SortOrderValue>("sortorder", query);
+            nq.ExternalReferenceUrl = NeuronModule.GetQueryArrayOrDefault(query, "erurl");
+            nq.ExternalReferenceUrlContains = NeuronModule.GetQueryArrayOrDefault(query, "erurlcontains");
             return nq;
         }
 

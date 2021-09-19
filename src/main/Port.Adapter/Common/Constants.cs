@@ -8,5 +8,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Common
         public const string EventSourcingOutBaseUrl = "EVENT_SOURCING_OUT_BASE_URL";
         public const string IdentityAccessInBaseUrl = "IDENTITY_ACCESS_IN_BASE_URL";
         public const string IdentityAccessOutBaseUrl = "IDENTITY_ACCESS_OUT_BASE_URL";
+        public const string NeuronsUrl = "NEURONS_URL";
+        public const string TerminalsUrl = "TERMINALS_URL";
     }
 }
