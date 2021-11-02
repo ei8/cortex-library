@@ -22,6 +22,8 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             base.ConfigureRequestContainer(container, context);
 
             container.Register<IRequestProvider, RequestProvider>();
+            container.Resolve<IRequestProvider>().SetHttpClientHandler(new System.Net.Http.HttpClientHandler());
+
             container.Register<ISettingsService, SettingsService>();
             container.Register<INeuronGraphQueryClient, HttpNeuronGraphQueryClient>();
             container.Register<IValidationClient, HttpValidationClient>();

@@ -1,5 +1,6 @@
 ﻿using ei8.Cortex.Library.Application.Neurons;
 using ei8.Cortex.Library.Application.Notification;
+using ei8.Cortex.Library.Common;
 using Nancy;
 using Nancy.Responses;
 using Newtonsoft.Json;
@@ -35,7 +36,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             {
                 return await NeuronModule.ProcessRequest(async () =>
                 {
-                    var nv = await terminalQueryService.GetTerminalById(parameters.terminalid, NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetUserId(this.Request));
+                    var nv = await terminalQueryService.GetTerminalById(parameters.terminalid, NeuronModule.ParseNeuronQueryOrEmpty(this.Request.Url.Query), NeuronModule.GetUserId(this.Request));
                     return new TextResponse(JsonConvert.SerializeObject(nv));
                 }
                 );
@@ -46,7 +47,7 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
             {
                 return await NeuronModule.ProcessRequest(async () =>
                     {
-                        var nv = await terminalQueryService.GetTerminals(NeuronModule.ExtractQuery(this.Request.Query), NeuronModule.GetUserId(this.Request));
+                        var nv = await terminalQueryService.GetTerminals(NeuronModule.ParseNeuronQueryOrEmpty(this.Request.Url.Query), NeuronModule.GetUserId(this.Request));
                         return new TextResponse(JsonConvert.SerializeObject(nv));
                     }
                 );

@@ -28,6 +28,7 @@ namespace ei8.Cortex.Library.Application
             result.PresynapticNot = value.PresynapticNot?.ToArray();
             result.TagContains = value.TagContains?.ToArray();
             result.TagContainsNot = value.TagContainsNot?.ToArray();
+            result.TagContainsIgnoreWhitespace = value.TagContainsIgnoreWhitespace;
             result.RegionId = value.RegionId?.ToArray();
             result.RegionIdNot = value.RegionIdNot?.ToArray();
             result.ExternalReferenceUrl = value.ExternalReferenceUrl?.ToArray();
