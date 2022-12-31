@@ -33,6 +33,7 @@ namespace ei8.Cortex.Library.Application
             result.RegionIdNot = value.RegionIdNot?.ToArray();
             result.ExternalReferenceUrl = value.ExternalReferenceUrl?.ToArray();
             result.ExternalReferenceUrlContains = value.ExternalReferenceUrlContains?.ToArray();
+            result.PostsynapticExternalReferenceUrl = value.PostsynapticExternalReferenceUrl?.ToArray();
 
             result.RelativeValues = Extensions.ConvertNullableEnumToExternal<RelativeValues, Graph.Common.RelativeValues>(
                 value.RelativeValues, 
@@ -138,20 +139,6 @@ namespace ei8.Cortex.Library.Application
             return result;
         }
 
-        internal static Library.Common.Notification ToInternalType(this EventSourcing.Common.Notification value)
-        {
-            return new Library.Common.Notification()
-            {
-                SequenceId = value.SequenceId,
-                TypeName = value.TypeName,
-                Id = value.Id,                 
-                Data = value.Data,
-                AuthorId = value.AuthorId,
-                Version = value.Version,
-                Timestamp = value.Timestamp
-            };
-        }
-
         internal static QueryResult<T> ToInternalType<T>(
             this Graph.Common.QueryResult value, 
             Func<Graph.Common.NeuronResult, T> itemsSelector) where T : class
@@ -169,7 +156,6 @@ namespace ei8.Cortex.Library.Application
                 value.Validation.ReadOnly = true;
             else
             {
-                value.Id = Guid.Empty.ToString();
                 value.Tag = string.Empty;
 
                 if (value.Terminal != null && value.Type == RelativeType.Presynaptic)
@@ -196,8 +182,6 @@ namespace ei8.Cortex.Library.Application
             else
             {                
                 value.Id = Guid.Empty.ToString();
-                value.PresynapticNeuronId = Guid.Empty.ToString();
-                value.PostsynapticNeuronId = Guid.Empty.ToString();
                 value.Effect = string.Empty;
                 value.Strength = string.Empty;
                 value.Version = 0;

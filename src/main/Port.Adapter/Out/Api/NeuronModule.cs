@@ -1,21 +1,17 @@
-﻿using Nancy;
+﻿using ei8.Cortex.Library.Application.Neurons;
+using ei8.Cortex.Library.Common;
+using Nancy;
 using Nancy.Responses;
+using neurUL.Common.Domain.Model;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using ei8.Cortex.Library.Common;
-using ei8.Cortex.Library.Application.Neurons;
-using neurUL.Common.Domain.Model;
-using ei8.Cortex.Library.Application.Notification;
-using System.Web;
 
 namespace ei8.Cortex.Library.Port.Adapter.Out.Api
 {
     public class NeuronModule : NancyModule
     {
-        public NeuronModule(INeuronQueryService queryService, IEventStoreApplicationService eventStoreApplicationService) : base("/cortex/neurons")
+        public NeuronModule(INeuronQueryService queryService) : base("/cortex/neurons")
         {
             this.Get("", async (parameters) =>
             {
@@ -65,23 +61,6 @@ namespace ei8.Cortex.Library.Port.Adapter.Out.Api
                         NeuronModule.ParseNeuronQueryOrEmpty(this.Request.Url.Query), 
                         NeuronModule.GetUserId(this.Request)
                         );
-                    return new TextResponse(JsonConvert.SerializeObject(nv));
-                }
-                );
-            }
-            );
-
-            this.Get("/{aggregateid:guid}/events", async (parameters) =>
-            {
-                return await NeuronModule.ProcessRequest(async () =>
-                {
-                    // TODO: validate if guid represents a neuron
-
-                    var nv = await eventStoreApplicationService.Get(
-                        parameters.aggregateid,
-                        0
-                        );
-
                     return new TextResponse(JsonConvert.SerializeObject(nv));
                 }
                 );

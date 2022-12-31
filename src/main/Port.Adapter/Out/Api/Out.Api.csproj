@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
-    <PackageReference Include="ei8.Cortex.Graph.Client" Version="0.2.4" />
-    <PackageReference Include="ei8.Cortex.Library.Common" Version="0.2.14" />
+    <PackageReference Include="ei8.Cortex.Graph.Client" Version="0.3.0" />
+    <PackageReference Include="ei8.Cortex.Library.Common" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.0.0" />
     <PackageReference Include="Nancy" Version="2.0.0-clinteastwood" />
     <PackageReference Include="Nancy.Serialization.JsonNet" Version="2.0.0-clinteastwood" />
