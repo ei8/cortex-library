@@ -63,6 +63,13 @@ namespace ei8.Cortex.Library.Application
                 v => ((int)v).ToString()
                 );
 
+            result.Depth = value.Depth;
+
+            result.DirectionValues = Extensions.ConvertNullableEnumToExternal<DirectionValues, Graph.Common.DirectionValues>(
+                value.DirectionValues,
+                v => ((int)v).ToString()
+                );
+
             return result;
         }
 
@@ -92,9 +99,19 @@ namespace ei8.Cortex.Library.Application
                 UnifiedLastModification = value.UnifiedLastModification.ToInternalType(),
                 Region = value.Region.ToInternalType(),
                 ExternalReferenceUrl = value.ExternalReferenceUrl,
-                Active = value.Active
+                Active = value.Active,
+                Traversals = value.Traversals?.Select(t => t.ToInternalType())
             } :
             null;
+        }
+
+        internal static Traversal ToInternalType(this Graph.Common.TraversalResult value)
+        {
+            return new Traversal()
+            {
+                Neurons = value.Neurons.Select(n => n.ToInternalType()),
+                Terminals = value.Terminals.Select(t => t.ToInternalType())
+            };
         }
 
         internal static Terminal ToInternalType(this Graph.Common.Terminal value)
@@ -167,6 +184,7 @@ namespace ei8.Cortex.Library.Application
                 value.LastModification = Extensions.CreateAuthorEventInfo();
                 value.UnifiedLastModification = Extensions.CreateAuthorEventInfo();
                 value.ExternalReferenceUrl = string.Empty;
+                value.Traversals = new Traversal[0];
                 value.Version = 0;
             }
 

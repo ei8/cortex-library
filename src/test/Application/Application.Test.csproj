@@ -135,7 +135,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Notification\NotificationApplicationServiceFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
