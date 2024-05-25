@@ -70,6 +70,10 @@ namespace ei8.Cortex.Library.Application
                 v => ((int)v).ToString()
                 );
 
+            result.TraversalPostsynapticNot = value.TraversalPostsynapticNot?.ToArray();
+            result.TraversalMinimumDepthPostsynaptic = value.TraversalMinimumDepthPostsynaptic?.Select(tm => new Graph.Common.DepthIdsPair() { Depth = tm.Depth, Ids = tm.Ids });
+            result.TraversalMinimumDepthPostsynapticNot = value.TraversalMinimumDepthPostsynapticNot?.Select(tm => new Graph.Common.DepthIdsPair() { Depth = tm.Depth, Ids = tm.Ids });
+
             return result;
         }
 
