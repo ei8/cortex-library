@@ -26,6 +26,8 @@ namespace ei8.Cortex.Library.Application
             result.PostsynapticNot = value.PostsynapticNot?.ToArray();
             result.Presynaptic = value.Presynaptic?.ToArray();
             result.PresynapticNot = value.PresynapticNot?.ToArray();
+            result.Tag = value.Tag?.ToArray();
+            result.TagNot = value.TagNot?.ToArray();
             result.TagContains = value.TagContains?.ToArray();
             result.TagContainsNot = value.TagContainsNot?.ToArray();
             result.TagContainsIgnoreWhitespace = value.TagContainsIgnoreWhitespace;
