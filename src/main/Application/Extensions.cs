@@ -222,7 +222,7 @@ namespace ei8.Cortex.Library.Application
             return new AuthorEventInfo() { Author = new NeuronInfo() };
         }
 
-        internal async static Task<IEnumerable<Neuron>> ProcessValidate(this IEnumerable<Neuron> neurons, string userId, IValidationClient validationClient, ISettingsService settingsService, CancellationToken token)
+        internal async static Task<Tuple<Guid, IEnumerable<Neuron>>> ProcessValidate(this IEnumerable<Neuron> neurons, string userId, IValidationClient validationClient, ISettingsService settingsService, CancellationToken token)
         {
             // validate read
             var validationResults = await validationClient.ReadNeurons(
@@ -259,7 +259,7 @@ namespace ei8.Cortex.Library.Application
                 }
                 );
 
-            return resultNeurons.ToArray();
+            return Tuple.Create(validationResults.UserNeuronId, resultNeurons.AsEnumerable());
         }
 
         internal async static Task<IEnumerable<Terminal>> ProcessValidate(this IEnumerable<Terminal> terminals, string userId, IValidationClient validationClient, ISettingsService settingsService, CancellationToken token)

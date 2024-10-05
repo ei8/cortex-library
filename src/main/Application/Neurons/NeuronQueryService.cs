@@ -36,12 +36,15 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType(n => n.ToInternalType());
-            result.Items = await result.Items.ProcessValidate(
+            var validationResult = await result.Items.ProcessValidate(
                 userId, 
                 this.validationClient, 
                 this.settingsService, 
                 token
                 );
+
+            result.UserNeuronId = validationResult.Item1;
+            result.Items = validationResult.Item2;
             return result;
         }
         
@@ -55,12 +58,15 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType(n => n.ToInternalType());
-            result.Items = await result.Items.ProcessValidate(
+            var validationResult = await result.Items.ProcessValidate(
                 userId,
                 this.validationClient,
                 this.settingsService,
                 token
                 );
+
+            result.UserNeuronId = validationResult.Item1;
+            result.Items = validationResult.Item2;
             return result;
         }
 
@@ -79,12 +85,14 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType(n => n.ToInternalType());
-            result.Items = await result.Items.ProcessValidate(
+            var validationResult = await result.Items.ProcessValidate(
                 userId,
                 this.validationClient,
                 this.settingsService,
                 token
-                );
+            );
+            result.UserNeuronId = validationResult.Item1;
+            result.Items = validationResult.Item2;
             return result;
         }
 
@@ -99,12 +107,15 @@ namespace ei8.Cortex.Library.Application.Neurons
                 );
 
             var result = commonResult.ToInternalType(n => n.ToInternalType());
-            result.Items = await result.Items.ProcessValidate(
+            var validationResult = await result.Items.ProcessValidate(
                 userId,
                 this.validationClient,
                 this.settingsService,
                 token
                 );
+
+            result.UserNeuronId = validationResult.Item1;
+            result.Items = validationResult.Item2;
             return result;
         }
     }
